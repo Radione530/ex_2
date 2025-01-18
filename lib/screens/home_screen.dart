@@ -132,6 +132,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 );
+              } else if (value == 'settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(),
+                  ),
+                );
               }
             },
             itemBuilder: (context) => [
