@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_browser/screens/settings_screen.dart';
 import 'package:movie_browser/screens/favorites_screen.dart';
+import 'package:movie_browser/screens/auth/login_screen.dart';
+import 'package:movie_browser/screens/auth/register_screen.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -139,6 +141,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => SettingsScreen(),
                   ),
                 );
+              } else if (value == 'login') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
+              } else if (value == 'register') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegisterScreen(),
+                  ),
+                );
               }
             },
             itemBuilder: (context) => [
@@ -149,6 +165,14 @@ class _HomeScreenState extends State<HomeScreen> {
               PopupMenuItem<String>(
                 value: 'settings',
                 child: Text('Settings'),
+              ),
+              PopupMenuItem<String>(
+                value: 'login',
+                child: Text('Login'),
+              ),
+              PopupMenuItem<String>(
+                value: 'register',
+                child: Text('Register'),
               ),
             ],
           ),

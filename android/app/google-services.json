@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "493628678652",
+    "project_id": "moviebrowser-d3c10",
+    "storage_bucket": "moviebrowser-d3c10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493628678652:android:2cd943691b14cbbb4b9279",
+        "android_client_info": {
+          "package_name": "com.example.movie_browser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzXf9HT2L-yLk4hIehF5YtOxxfGV5ntV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
