@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_browser/screens/settings_screen.dart';
+import 'package:movie_browser/screens/favorites_screen.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,10 +15,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> filteredMovies = [];
   bool isLoading = true;
   String errorMessage = '';
-
   String selectedSortOption = 'release_date';
   Set<String> selectedGenres = Set();
   String searchQuery = '';
+  Set<int> favoriteMovies = Set();
 
   @override
   void initState() {
@@ -32,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -64,14 +64,12 @@ class _HomeScreenState extends State<HomeScreen> {
             !movie['title'].toLowerCase().contains(searchQuery.toLowerCase())) {
           return false;
         }
-
         if (selectedGenres.isNotEmpty) {
           return selectedGenres
               .any((genre) => movie['genre_ids'].contains(genre));
         }
         return true;
       }).toList();
-
       switch (selectedSortOption) {
         case 'title':
           filteredMovies.sort((a, b) => a['title'].compareTo(b['title']));
@@ -84,6 +82,16 @@ class _HomeScreenState extends State<HomeScreen> {
           filteredMovies
               .sort((a, b) => b['vote_average'].compareTo(a['vote_average']));
           break;
+      }
+    });
+  }
+
+  void toggleFavorite(int movieId) {
+    setState(() {
+      if (favoriteMovies.contains(movieId)) {
+        favoriteMovies.remove(movieId);
+      } else {
+        favoriteMovies.add(movieId);
       }
     });
   }
@@ -107,14 +115,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()),
-              );
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'favorites') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritesScreen(
+                      allMovies: movies,
+                      favoriteMovies: favoriteMovies,
+                      onFavoritesChanged: (updatedFavorites) {
+                        setState(() {
+                          favoriteMovies = updatedFavorites;
+                        });
+                      },
+                    ),
+                  ),
+                );
+              }
             },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'favorites',
+                child: Text('Favorites'),
+              ),
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: Text('Settings'),
+              ),
+            ],
           ),
         ],
       ),
@@ -163,35 +192,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               );
                             }).toList(),
                           ),
-                          SizedBox(width: 10),
-                          FilterChip(
-                            label: Text('Action'),
-                            selected: selectedGenres.contains('Action'),
-                            onSelected: (bool selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedGenres.add('Action');
-                                } else {
-                                  selectedGenres.remove('Action');
-                                }
-                              });
-                              applyFilters();
-                            },
-                          ),
-                          FilterChip(
-                            label: Text('Comedy'),
-                            selected: selectedGenres.contains('Comedy'),
-                            onSelected: (bool selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedGenres.add('Comedy');
-                                } else {
-                                  selectedGenres.remove('Comedy');
-                                }
-                              });
-                              applyFilters();
-                            },
-                          ),
                         ],
                       ),
                     ),
@@ -200,6 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: filteredMovies.length,
                         itemBuilder: (context, index) {
                           final movie = filteredMovies[index];
+                          final isFavorite =
+                              favoriteMovies.contains(movie['id']);
                           return ListTile(
                             leading: movie['poster_path'] != null
                                 ? Image.network(
@@ -211,6 +213,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : Icon(Icons.image),
                             title: Text(movie['title']),
                             subtitle: Text(formatDate(movie['release_date'])),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorite ? Colors.red : null,
+                              ),
+                              onPressed: () => toggleFavorite(movie['id']),
+                            ),
                           );
                         },
                       ),
