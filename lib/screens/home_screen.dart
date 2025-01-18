@@ -11,8 +11,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> movies = [];
+  List<dynamic> filteredMovies = [];
   bool isLoading = true;
   String errorMessage = '';
+
+  String selectedSortOption = 'release_date';
+  Set<String> selectedGenres = Set();
 
   @override
   void initState() {
@@ -32,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final data = jsonDecode(response.body);
         setState(() {
           movies = data['results'];
+          filteredMovies = List.from(movies);
           isLoading = false;
         });
       } else {
@@ -49,6 +54,32 @@ class _HomeScreenState extends State<HomeScreen> {
     final DateFormat formatter = DateFormat('dd MMM yyyy');
     final DateTime date = DateTime.parse(releaseDate);
     return formatter.format(date);
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredMovies = movies.where((movie) {
+        if (selectedGenres.isNotEmpty) {
+          return selectedGenres
+              .any((genre) => movie['genre_ids'].contains(genre));
+        }
+        return true;
+      }).toList();
+
+      switch (selectedSortOption) {
+        case 'title':
+          filteredMovies.sort((a, b) => a['title'].compareTo(b['title']));
+          break;
+        case 'release_date':
+          filteredMovies
+              .sort((a, b) => a['release_date'].compareTo(b['release_date']));
+          break;
+        case 'rating':
+          filteredMovies
+              .sort((a, b) => b['vote_average'].compareTo(a['vote_average']));
+          break;
+      }
+    });
   }
 
   @override
@@ -85,23 +116,85 @@ class _HomeScreenState extends State<HomeScreen> {
           ? Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
               ? Center(child: Text(errorMessage))
-              : ListView.builder(
-                  itemCount: movies.length,
-                  itemBuilder: (context, index) {
-                    final movie = movies[index];
-                    return ListTile(
-                      leading: movie['poster_path'] != null
-                          ? Image.network(
-                              'https://image.tmdb.org/t/p/w200${movie['poster_path']}',
-                              fit: BoxFit.cover,
-                              height: 100,
-                              width: 100,
-                            )
-                          : Icon(Icons.image),
-                      title: Text(movie['title']),
-                      subtitle: Text(formatDate(movie['release_date'])),
-                    );
-                  },
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          DropdownButton<String>(
+                            value: selectedSortOption,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedSortOption = newValue!;
+                              });
+                              applyFilters();
+                            },
+                            items: <String>['release_date', 'title', 'rating']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value == 'release_date'
+                                    ? 'Release Date'
+                                    : value == 'rating'
+                                        ? 'Rating'
+                                        : 'Title'),
+                              );
+                            }).toList(),
+                          ),
+                          SizedBox(width: 10),
+                          FilterChip(
+                            label: Text('Action'),
+                            selected: selectedGenres.contains('Action'),
+                            onSelected: (bool selected) {
+                              setState(() {
+                                if (selected) {
+                                  selectedGenres.add('Action');
+                                } else {
+                                  selectedGenres.remove('Action');
+                                }
+                              });
+                              applyFilters();
+                            },
+                          ),
+                          FilterChip(
+                            label: Text('Comedy'),
+                            selected: selectedGenres.contains('Comedy'),
+                            onSelected: (bool selected) {
+                              setState(() {
+                                if (selected) {
+                                  selectedGenres.add('Comedy');
+                                } else {
+                                  selectedGenres.remove('Comedy');
+                                }
+                              });
+                              applyFilters();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredMovies.length,
+                        itemBuilder: (context, index) {
+                          final movie = filteredMovies[index];
+                          return ListTile(
+                            leading: movie['poster_path'] != null
+                                ? Image.network(
+                                    'https://image.tmdb.org/t/p/w200${movie['poster_path']}',
+                                    fit: BoxFit.cover,
+                                    height: 100,
+                                    width: 100,
+                                  )
+                                : Icon(Icons.image),
+                            title: Text(movie['title']),
+                            subtitle: Text(formatDate(movie['release_date'])),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
     );
   }
