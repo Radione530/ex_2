@@ -1,16 +1,23 @@
-# movie_browser
+# Movie Browser
 
-A new Flutter project.
+Movie Browser is a Flutter-based application designed to help users explore and discover movies. The app allows users to view movie details, including title, description, and poster, with a simple, user-friendly interface.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Browse movies
+- View detailed information about each movie
+- Responsive design for mobile and web platforms
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Framework**: Flutter
+- **Programming Language**: Dart
+- **Platform**: Mobile (Android, iOS) and Web
+- **State Management**: Provider (or any other preferred solution)
+- **Database**: Firebase (if applicable in future)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Setup
+
+1. Clone this repository to your local machine:
+   ```bash
+   git clone https://github.com/Radione530/ex_2.git
