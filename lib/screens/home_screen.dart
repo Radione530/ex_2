@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String selectedSortOption = 'release_date';
   Set<String> selectedGenres = Set();
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -59,6 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void applyFilters() {
     setState(() {
       filteredMovies = movies.where((movie) {
+        if (searchQuery.isNotEmpty &&
+            !movie['title'].toLowerCase().contains(searchQuery.toLowerCase())) {
+          return false;
+        }
+
         if (selectedGenres.isNotEmpty) {
           return selectedGenres
               .any((genre) => movie['genre_ids'].contains(genre));
@@ -122,6 +128,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                labelText: 'Search for a movie...',
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (query) {
+                                setState(() {
+                                  searchQuery = query;
+                                });
+                                applyFilters();
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 10),
                           DropdownButton<String>(
                             value: selectedSortOption,
                             onChanged: (String? newValue) {
