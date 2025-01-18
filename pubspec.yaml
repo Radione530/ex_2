@@ -1,0 +1,47 @@
+name: movie_browser
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Cupertino Icons (iOS icons)
+  cupertino_icons: ^1.0.8
+
+  # Provider for state management
+  provider: ^6.0.1
+
+  # HTTP for making network requests (e.g. API calls)
+  http: ^0.13.3
+
+  # SQLite for local storage (offline data)
+  sqflite: ^2.0.0+4
+
+  # Firebase Authentication for user login and registration (optional)
+  firebase_auth: ^3.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting for good coding practices
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # If you're using custom fonts or images, you can define them here
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: fonts/Roboto-Regular.ttf
+  #       - asset: fonts/Roboto-Bold.ttf
+  #
+  # assets:
+  #   - images/movie_poster.jpeg
