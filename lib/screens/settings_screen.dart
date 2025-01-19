@@ -6,11 +6,11 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ustawienia'),
+        title: Text('Settings'),
       ),
       body: Center(
         child: ListTile(
-          title: Text('Tryb ciemny'),
+          title: Text('Dark mode'),
           trailing: Switch(
             value: Theme.of(context).brightness == Brightness.dark,
             onChanged: (bool value) {
