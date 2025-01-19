@@ -5,6 +5,7 @@ import 'package:movie_browser/screens/settings_screen.dart';
 import 'package:movie_browser/screens/favorites_screen.dart';
 import 'package:movie_browser/screens/auth/login_screen.dart';
 import 'package:movie_browser/screens/auth/register_screen.dart';
+import 'package:movie_browser/screens/auth/user_screen.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -68,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         if (selectedGenres.isNotEmpty) {
           return selectedGenres
-              .any((genre) => movie['genre_ids'].contains(genre));
+              .any((genre) => movie['genre_ids'].contains(int.parse(genre)));
         }
         return true;
       }).toList();
@@ -103,16 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Icon(Icons.movie, size: 28),
             SizedBox(width: 10),
             Text(
               'Movie Browser',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -137,44 +134,35 @@ class _HomeScreenState extends State<HomeScreen> {
               } else if (value == 'settings') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
                 );
               } else if (value == 'login') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
                 );
               } else if (value == 'register') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => RegisterScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => RegisterScreen()),
                 );
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'favorites',
-                child: Text('Favorites'),
-              ),
-              PopupMenuItem<String>(
-                value: 'settings',
-                child: Text('Settings'),
-              ),
-              PopupMenuItem<String>(
-                value: 'login',
-                child: Text('Login'),
-              ),
-              PopupMenuItem<String>(
-                value: 'register',
-                child: Text('Register'),
-              ),
+              PopupMenuItem(value: 'favorites', child: Text('Favorites')),
+              PopupMenuItem(value: 'settings', child: Text('Settings')),
+              PopupMenuItem(value: 'login', child: Text('Login')),
+              PopupMenuItem(value: 'register', child: Text('Register')),
             ],
+          ),
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -202,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             ),
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 8),
                           DropdownButton<String>(
                             value: selectedSortOption,
                             onChanged: (String? newValue) {
@@ -215,11 +203,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value == 'release_date'
-                                    ? 'Release Date'
-                                    : value == 'rating'
-                                        ? 'Rating'
-                                        : 'Title'),
+                                child: Text(
+                                  value == 'release_date'
+                                      ? 'Release Date'
+                                      : value == 'rating'
+                                          ? 'Rating'
+                                          : 'Title',
+                                ),
                               );
                             }).toList(),
                           ),
@@ -233,25 +223,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           final movie = filteredMovies[index];
                           final isFavorite =
                               favoriteMovies.contains(movie['id']);
-                          return ListTile(
-                            leading: movie['poster_path'] != null
-                                ? Image.network(
-                                    'https://image.tmdb.org/t/p/w200${movie['poster_path']}',
-                                    fit: BoxFit.cover,
-                                    height: 100,
-                                    width: 100,
-                                  )
-                                : Icon(Icons.image),
-                            title: Text(movie['title']),
-                            subtitle: Text(formatDate(movie['release_date'])),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: isFavorite ? Colors.red : null,
+                          return Card(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 6, horizontal: 8),
+                            child: ListTile(
+                              leading: movie['poster_path'] != null
+                                  ? Image.network(
+                                      'https://image.tmdb.org/t/p/w200${movie['poster_path']}',
+                                      fit: BoxFit.cover,
+                                      height: 100,
+                                      width: 70,
+                                    )
+                                  : Icon(Icons.image),
+                              title: Text(movie['title']),
+                              subtitle: Text(formatDate(movie['release_date'])),
+                              trailing: IconButton(
+                                icon: Icon(
+                                  isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isFavorite ? Colors.red : null,
+                                ),
+                                onPressed: () => toggleFavorite(movie['id']),
                               ),
-                              onPressed: () => toggleFavorite(movie['id']),
                             ),
                           );
                         },
